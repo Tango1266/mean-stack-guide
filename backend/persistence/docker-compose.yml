@@ -1,0 +1,5 @@
+mongodb:
+        image: mongo:latest
+        container_name: "mongoDB"
+        ports:
+            - 27017:27017

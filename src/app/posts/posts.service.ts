@@ -3,7 +3,6 @@ import {Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Post} from './post.model';
 import {HttpClient} from '@angular/common/http';
-import {post} from 'selenium-webdriver/http';
 
 interface RespondObject {
     message: string;
