@@ -1,11 +1,11 @@
 const http = require('http');
+const app = require('./app');
 
-const server = http.createServer(
-    (request, response) => {
-        // func which gets executed on every request
-        response.end('First response.')
 
-    });
+const port = process.env.PORT || 3000;
+
+app.set('port',port);
+const server = http.createServer(app);
 
 // process.env.PORT will be set from a web hosting provider
-server.listen(process.env.PORT || 3000);
+server.listen(port);
