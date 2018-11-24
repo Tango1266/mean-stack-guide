@@ -34,13 +34,15 @@ app.post("/api/posts", (req, res, next) => {
         title: req.body.title,
         content: req.body.content
     });
-    post.save().then(pst => {
-        console.log("saved " + pst)
+    post.save().then(createdPost => {
+        res.status(201).json({
+            message: 'Post successfully added!',
+            // id is stored in DB as _id
+            postId: createdPost._id
     }).catch(err => {
         console.log(err)
     });
-    res.status(201).json({
-        message: 'Post successfully added!'
+
     });
     // don't use next here, because responde is already out
 });
