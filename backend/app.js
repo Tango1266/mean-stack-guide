@@ -12,7 +12,7 @@ app.use((req, res, next) =>{
     // CROSS: Allow access from all domains
     res.setHeader('Access-Control-Allow-Origin', '*');
     // CROSS: Allow only request containing defined attributes
-    res.setHeader('Access-Control-Allow-Header',
+    res.setHeader('Access-Control-Allow-Headers',
         'Origin, X-Requested-With, Content-Type, Accept');
     // CROSS: Only allow certain rest-methods
     res.setHeader('Access-Control-Allow-Methods',"GET, POST, PATCH, DELETE, OPTIONS")
@@ -25,6 +25,7 @@ app.post("ap/posts", (req, res, next) => {
     res.status(201).json({
         message: 'Post successfully added!'
     });
+    // don't use next here, because responde is already out
 });
 
 app.use('/api/posts', (req, res, next) => {
