@@ -3,6 +3,7 @@ import {Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Post} from './post.model';
 import {HttpClient} from '@angular/common/http';
+import {post} from 'selenium-webdriver/http';
 
 interface RespondObject {
     message: string;
@@ -60,6 +61,9 @@ export class PostsService {
         this.httpClient.delete('http://localhost:3000/api/posts/' + postId)
             .subscribe(() => {
                 console.log('Deleted post: ' + postId);
+                const updatePosts = this.posts.filter(post => post.id !== postId);
+                this.posts = updatePosts;
+                this.postsUpdated.next([...this.posts]);
             });
     }
 }
