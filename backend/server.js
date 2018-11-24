@@ -1,11 +1,56 @@
 const http = require('http');
 const app = require('./app');
 
+const normalizePort = val => {
+    // validates port number
+    const port = parseInt(val, 10);
 
-const port = process.env.PORT || 3000;
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
 
-app.set('port',port);
-const server = http.createServer(app);
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+};
+
+const onError = error => {
+    if (error.syscall !== "listen") {
+        throw error;
+    }
+    const addr = server.address();
+    const bind = typeof  addr === "string" ? "pipe" + addr : "port " + port;
+    switch (error.code) {
+        case "EACCES":
+            console.error(bind + " requires elevated privileges");
+            process.exit(1);
+            break;
+        case "EADDRINUSE":
+            console.error(bind + "is already in use");
+            process.exit(1);
+            break;
+        default:
+            throw error;
+
+    }
+};
+
+const onListening = () => {
+    const addr = server.address();
+    const bind = typeof addr === "string" ? "pipe" + addr: "port " + port;
+    debug("Listening on " + bind)
+};
 
 // process.env.PORT will be set from a web hosting provider
+const port = normalizePort(process.env.PORT || 3000);
+app.set('port',port);
+
+const server = http.createServer(app);
+//register listener
+server.on('error', onError);
+server.on('listening', onListening);
 server.listen(port);
