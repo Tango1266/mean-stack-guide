@@ -11,7 +11,7 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
     res.send('Hello from express!');
-};
+});
 
 // export the app instance
 module.exports = app;
