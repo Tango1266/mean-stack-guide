@@ -4,6 +4,16 @@ const express = require('express');
 // (middleware - intersect client server communication)
 const app = express();
 
+app.use((req, res, next) =>{
+    // CROSS: Allow access from all domains
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // CROSS: Allow only request containing defined attributes
+    res.setHeader('Access-Control-Allow-Header',
+        'Origin, X-Requested-With, Content-Type, Accept');
+    // CROSS: Only allow certain rest-methods
+    res.setHeader('Access-Control-Allow-Methods',"GET, POST, PATCH, DELETE, OPTIONS")
+    next();
+});
 
 app.use('/api/posts', (req, res, next) => {
     const posts = [
