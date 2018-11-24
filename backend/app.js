@@ -8,8 +8,7 @@ const Post = require('./models/post')
 // (middleware - intersect client server communication)
 const app = express();
 
-//"mongo -u \"foouser\" -p \"foopwd\"
-mongoose.connect("mongodb://localhost:27017/mongoDB").then(() => {
+mongoose.connect("mongodb://localhost:27017/mean-stack").then(() => {
     console.log('Connected to database!');
 }).catch(() => {
     console.log('Connection failed!');
@@ -30,30 +29,34 @@ app.use((req, res, next) =>{
     next();
 });
 
-app.post("ap/posts", (req, res, next) => {
+app.post("/api/posts", (req, res, next) => {
     const post = new Post({
         title: req.body.title,
         content: req.body.content
     });
-    console.log(post);
+    post.save().then(pst => {
+        console.log("saved " + pst)
+    }).catch(err => {
+        console.log(err)
+    });
     res.status(201).json({
         message: 'Post successfully added!'
     });
     // don't use next here, because responde is already out
 });
 
-app.use('/api/posts', (req, res, next) => {
-    const posts = [
-        {id:"1", title:"First post", content:"First post content"},
-        {id:"2", title:"Second post", content:"Second post content"},
-        {id:"3", title:"Third post", content:"Third post content"},
-    ];
+app.get('/api/posts', (req, res, next) => {
+    // find returns error and results when finished
+    Post.find().then(documents => {
+        console.log(documents);
 
-    // will be returned
-    res.status(200).json({
-        message: 'Posts fetched successfully!',
-        posts: posts
-    })
+        res.status(200).json({
+            message: 'Posts fetched successfully!',
+            posts: documents
+        })
+    }).catch(err => {
+        console.log(err)
+    });
 });
 
 // export the app instance
