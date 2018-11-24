@@ -17,6 +17,9 @@ export class PostsService {
     constructor(private httpClient: HttpClient) {
     }
 
+    getPost(id: string): Post {
+        return {...this.posts.find(post => post.id === id)};
+    }
     getPosts() {
         this.httpClient
             .get<RespondObject>('http://localhost:3000/api/posts')
@@ -65,6 +68,15 @@ export class PostsService {
                 const updatePosts = this.posts.filter(post => post.id !== postId);
                 this.posts = updatePosts;
                 this.postsUpdated.next([...this.posts]);
+            });
+    }
+
+    updatePost(id: string, title: string, content: string) {
+        const post: Post = {id: id, title: title, content: content};
+        // second arg is payload
+        this.httpClient.put('http://localhost:3000/api/posts/' + id, post)
+            .subscribe(response => {
+                console.log(response);
             });
     }
 }
