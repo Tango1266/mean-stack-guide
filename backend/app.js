@@ -1,8 +1,19 @@
 const express = require('express');
 const bodyParser = require('body-parser')
+const mongoose = require('mongoose');
+
+const Post = require('./models/post')
+
 // create express app
 // (middleware - intersect client server communication)
 const app = express();
+
+//"mongo -u \"foouser\" -p \"foopwd\"
+mongoose.connect("mongodb://localhost:27017/mongoDB").then(() => {
+    console.log('Connected to database!');
+}).catch(() => {
+    console.log('Connection failed!');
+});
 
 app.use(bodyParser.json());
 // unused in app
@@ -20,7 +31,10 @@ app.use((req, res, next) =>{
 });
 
 app.post("ap/posts", (req, res, next) => {
-    const post = req.body;
+    const post = new Post({
+        title: req.body.title,
+        content: req.body.content
+    });
     console.log(post);
     res.status(201).json({
         message: 'Post successfully added!'
