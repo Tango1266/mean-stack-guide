@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
 import {Subject} from 'rxjs';
-
+import {map} from 'rxjs/operators';
 import {Post} from './post.model';
 import {HttpClient} from '@angular/common/http';
 
 interface RespondObject {
     message: string;
-    posts: Post[];
+    posts: any;
 }
 
 @Injectable({providedIn: 'root'})
@@ -18,12 +18,25 @@ export class PostsService {
     }
 
     getPosts() {
-        this.httpClient.get<RespondObject>('http://localhost:3000/api/posts')
-        // unsubscription will be handled in http framework
+        this.httpClient
+            .get<RespondObject>('http://localhost:3000/api/posts')
+            // pipe can execute operations on each respondObject
+            .pipe(map((postData) => {
+                // transform _id to id
+                return postData.posts.map(post => {
+                    const transformedPost = {
+                        id: post._id,
+                        title: post.title,
+                        content: post.content
+                    };
+                    return transformedPost;
+                });
+            }))
+            // unsubscription will be handled in http framework
             .subscribe(
                 // httpClient will return body of the respond
-                (postData) => {
-                    this.posts = postData.posts;
+                (transformedPosts) => {
+                    this.posts = transformedPosts;
                     this.postsUpdated.next([...this.posts]);
                 });
     }
