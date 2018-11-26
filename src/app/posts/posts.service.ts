@@ -8,12 +8,13 @@ import {Router} from '@angular/router';
 interface RespondObject {
     message: string;
     posts: any;
+    maxPosts: number;
 }
 
 @Injectable({providedIn: 'root'})
 export class PostsService {
     private posts: Post[] = [];
-    private postsUpdated = new Subject<Post[]>();
+    private postsUpdated = new Subject<{posts: Post[], postCount: number}>();
 
     constructor(private httpClient: HttpClient, private router: Router) {
     }
@@ -29,22 +30,26 @@ export class PostsService {
             // pipe can execute operations on each respondObject
             .pipe(map((postData) => {
                 // transform _id to id
-                return postData.posts.map(post => {
-                    const transformedPost = {
-                        id: post._id,
-                        title: post.title,
-                        content: post.content,
-                        imagePath: post.imagePath
+                    return {
+                        posts: postData.posts.map(post => {
+                            const transformedPost = {
+                                id: post._id,
+                                title: post.title,
+                                content: post.content,
+                                imagePath: post.imagePath
+                            };
+                            return transformedPost;
+                        }),
+                        maxPosts: postData.maxPosts
                     };
-                    return transformedPost;
-                });
-            }))
+                })
+            )
             // unsubscription will be handled in http framework
             .subscribe(
                 // httpClient will return body of the respond
-                (transformedPosts) => {
-                    this.posts = transformedPosts;
-                    this.postsUpdated.next([...this.posts]);
+                (transformedPostData) => {
+                    this.posts = transformedPostData.posts;
+                    this.postsUpdated.next({posts: [...this.posts], postCount: transformedPostData.maxPosts});
                 });
     }
 
@@ -63,31 +68,12 @@ export class PostsService {
                 'http://localhost:3000/api/posts',
                 postData)
             .subscribe( (responseData) => {
-                // will only executed with successful request
-
-                // create new post
-                const post: Post = {
-                    id: responseData.post.id,
-                    title: title,
-                    content: content,
-                    imagePath: responseData.post.imagePath
-                };
-
-                // send request, get next, and navigate back to root
-                this.posts.push(post);
-                this.postsUpdated.next([...this.posts]);
                 this.router.navigate(['/']);
             });
     }
 
     deletePost(postId: string){
-        this.httpClient.delete('http://localhost:3000/api/posts/' + postId)
-            .subscribe(() => {
-                console.log('Deleted post: ' + postId);
-                const updatePosts = this.posts.filter(post => post.id !== postId);
-                this.posts = updatePosts;
-                this.postsUpdated.next([...this.posts]);
-            });
+       return this.httpClient.delete('http://localhost:3000/api/posts/' + postId);
     }
 
     updatePost(id: string, title: string, content: string, image: File | string) {
@@ -113,17 +99,6 @@ export class PostsService {
         this.httpClient
             .put('http://localhost:3000/api/posts/' + id, postData)
             .subscribe((response) => {
-                const updatedPosts = [...this.posts];
-                const oldPostIndex = updatedPosts.findIndex(p => p.id === id);
-                const post: Post = {
-                    id: id,
-                    title: title,
-                    content: content,
-                    imagePath: ""
-                };
-                updatedPosts[oldPostIndex] = post;
-                this.posts = updatedPosts;
-                this.postsUpdated.next({...this.posts});
                 this.router.navigate(['/']);
             });
     }

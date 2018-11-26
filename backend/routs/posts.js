@@ -58,6 +58,7 @@ router.get('', (req, res, next) => {
     const pageSize = +req.query.pagesize;
     const currentPage = +req.query.page;
     const postQuery = Post.find();
+    let fetchedPosts;
 
     if(pageSize && currentPage){
         // constraint on query
@@ -67,12 +68,15 @@ router.get('', (req, res, next) => {
     }
     // find returns error and results when finished
     postQuery.then(documents => {
-        console.log(documents);
+        fetchedPosts = documents;
+        return Post.count();
+    }).then(count => {
+       res.status(200).json({
+           message: "Posts fetched successfully!",
+           posts: fetchedPosts,
+           maxPosts: count
+       })
 
-        res.status(200).json({
-            message: 'Posts fetched successfully!',
-            posts: documents
-        })
     })
 });
 

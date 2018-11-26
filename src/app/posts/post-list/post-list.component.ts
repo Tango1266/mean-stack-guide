@@ -13,7 +13,7 @@ import {PageEvent} from '@angular/material';
 export class PostListComponent implements OnInit, OnDestroy {
     currentPage = 1;
     postsPerPage = 2;
-    totalPosts = 10;
+    totalPosts = 0;
     pageSizeOptions = [1, 2, 5, 10];
     posts: Post[] = [];
     private postsSub: Subscription;
@@ -32,9 +32,10 @@ export class PostListComponent implements OnInit, OnDestroy {
                 // Args: 1. funcOnUpdate, 2.funcOnError, 3. onEndService
                 .subscribe(
                     // 1. Arg:
-                    (posts: Post[]) => {
+                    (postData: { posts: Post[], postCount: number }) => {
                         this.isLoading = false;
-                        this.posts = posts;
+                        this.posts = postData.posts;
+                        this.totalPosts = postData.postCount;
                     });
     }
 
@@ -44,10 +45,14 @@ export class PostListComponent implements OnInit, OnDestroy {
     }
 
     onDelete(posId: string) {
-        this.postsService.deletePost(posId);
+        this.isLoading = true;
+        this.postsService.deletePost(posId).subscribe(() => {
+            this.postsService.getPosts(this.postsPerPage, this.currentPage);
+        });
     }
 
     onChangedPage(pageData: PageEvent) {
+        this.isLoading = true;
         this.postsPerPage = pageData.pageSize;
         // pagination in db is 1 based
         this.currentPage = pageData.pageIndex + 1;
