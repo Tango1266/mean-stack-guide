@@ -21,7 +21,7 @@
         <!--IMAGE PICKER-->
         <div>
             <button mat-stroke-button (click)="filePicker.click()" type="button">Pick Image</button>
-            <input type="file" #filePicker>
+            <input type="file" #filePicker (change)="onImagePicked($event)">
         </div>
 
         <!--POST CONTENT-->

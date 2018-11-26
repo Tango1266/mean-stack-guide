@@ -23,26 +23,14 @@ export class PostCreateComponent implements OnInit {
     constructor(public postsService: PostsService, public rout: ActivatedRoute) {
     }
 
-    onSavePost() {
-        if (this.form.invalid) {
-            return;
-        }
-        // does not need to set to back to false
-        // will be redirected where it is handled
-        this.isLoading = true;
-        if (this.mode === 'create') {
-            this.postsService.addPost(this.form.value.title, this.form.value.content);
-        } else {
-            this.postsService.updatePost(this.postId, this.form.value.title, this.form.value.content);
-        }
-        this.form.reset();
-    }
-
     ngOnInit(): void {
         this.form = new FormGroup({
             'title': new FormControl(null, {
                 validators: [Validators.required, Validators.minLength(3)]}),
             'content': new FormControl(null, {
+                validators: [Validators.required]
+            }),
+            'image': new FormControl(null, {
                 validators: [Validators.required]
             })
         });
@@ -65,5 +53,29 @@ export class PostCreateComponent implements OnInit {
                 this.postId = null;
             }
         });
+    }
+
+    onImagePicked(event: Event){
+        const target = event.target as HTMLInputElement;
+        const file = target.files[0];
+        this.form.patchValue({image: file});
+        this.form.get('image').updateValueAndValidity();
+        console.log(file);
+        console.log(this.form);
+    }
+
+    onSavePost() {
+        if (this.form.invalid) {
+            return;
+        }
+        // does not need to set to back to false
+        // will be redirected where it is handled
+        this.isLoading = true;
+        if (this.mode === 'create') {
+            this.postsService.addPost(this.form.value.title, this.form.value.content);
+        } else {
+            this.postsService.updatePost(this.postId, this.form.value.title, this.form.value.content);
+        }
+        this.form.reset();
     }
 }
