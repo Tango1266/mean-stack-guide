@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -17,6 +18,8 @@ mongoose.connect("mongodb://localhost:27017/mean-stack").then(() => {
 app.use(bodyParser.json());
 // unused in app
 app.use(bodyParser.urlencoded({extended: false}));
+// make images folder accessible
+app.use("/images", express.static(path.join("backend/images")));
 
 app.use((req, res, next) =>{
     // CROSS: Allow access from all domains
