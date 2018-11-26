@@ -15,23 +15,23 @@ const MIME_TYPE_MAP = {
 // configure multer regarding storage
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        const isValid = MIME_TYPE_MAP[file.mimeType];
-        let error = new Error('Invalide mime type');
+        const isValid = MIME_TYPE_MAP[file.mimetype];
+        let error = new Error('Invalid mime type');
         if (isValid) {
             error = null;
         }
         // storage is relative to server.js
-        callback(error, "./images")
+        callback(error, "backend/images")
     },
     filename: (req, file, callback) => {
         const name = file.originalname.toLowerCase().split(' ').join('-');
-        const extension = MIME_TYPE_MAP[file.mimeType];
+        const extension = MIME_TYPE_MAP[file.mimetype];
         callback(null, name + '-' + Date.now() + '.' + extension)
 
     }
 });
 
-router.post("", multer(storage).single('image'), (req, res, next) => {
+router.post("", multer({storage: storage}).single('image'), (req, res, next) => {
     const post = new Post({
         title: req.body.title,
         content: req.body.content
