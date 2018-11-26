@@ -32,7 +32,8 @@ export class PostsService {
                     const transformedPost = {
                         id: post._id,
                         title: post.title,
-                        content: post.content
+                        content: post.content,
+                        imagePath: post.imagePath
                     };
                     return transformedPost;
                 });
@@ -57,13 +58,21 @@ export class PostsService {
         postData.append('image', image, title);
 
         this.httpClient
-            .post<{ message: string, postId: string }>(
+            .post<{ message: string, post: Post }>(
                 'http://localhost:3000/api/posts',
                 postData)
             .subscribe( (responseData) => {
                 // will only executed with successful request
 
-                const post: Post = {id: responseData.postId, title: title, content: content};
+                // create new post
+                const post: Post = {
+                    id: responseData.post.id,
+                    title: title,
+                    content: content,
+                    imagePath: responseData.post.imagePath
+                };
+
+                // send request, get next, and navigate back to root
                 this.posts.push(post);
                 this.postsUpdated.next([...this.posts]);
                 this.router.navigate(['/']);
@@ -81,7 +90,7 @@ export class PostsService {
     }
 
     updatePost(id: string, title: string, content: string) {
-        const post: Post = {id: id, title: title, content: content};
+        const post: Post = {id: id, title: title, content: content, imagePath: null};
         // second arg is payload
         this.httpClient.put('http://localhost:3000/api/posts/' + id, post)
             .subscribe(response => {
