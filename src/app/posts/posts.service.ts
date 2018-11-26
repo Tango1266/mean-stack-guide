@@ -22,9 +22,10 @@ export class PostsService {
         return this.httpClient.get<{_id: string, title: string, content: string, imagePath: string}>('http://localhost:3000/api/posts/' + id);
     }
 
-    getPosts() {
+    getPosts(postsPerPage: number, currentPage: number) {
+        const queryParams = `?page=${currentPage}&pagesize=${postsPerPage}`;
         this.httpClient
-            .get<RespondObject>('http://localhost:3000/api/posts')
+            .get<RespondObject>('http://localhost:3000/api/posts' + queryParams)
             // pipe can execute operations on each respondObject
             .pipe(map((postData) => {
                 // transform _id to id

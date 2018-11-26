@@ -11,7 +11,8 @@ import {PageEvent} from '@angular/material';
     styleUrls: ['./post-list.component.css']
 })
 export class PostListComponent implements OnInit, OnDestroy {
-    postsPerPage: 2;
+    currentPage = 1;
+    postsPerPage = 2;
     totalPosts = 10;
     pageSizeOptions = [1, 2, 5, 10];
     posts: Post[] = [];
@@ -23,7 +24,7 @@ export class PostListComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.isLoading = true;
-        this.postsService.getPosts();
+        this.postsService.getPosts(this.postsPerPage, 1);
 
         this.postsSub =
             this.postsService
@@ -47,6 +48,9 @@ export class PostListComponent implements OnInit, OnDestroy {
     }
 
     onChangedPage(pageData: PageEvent) {
-        console.log(pageData);
+        this.postsPerPage = pageData.pageSize;
+        // pagination in db is 1 based
+        this.currentPage = pageData.pageIndex + 1;
+        this.postsService.getPosts(this.postsPerPage, this.currentPage);
     }
 }
