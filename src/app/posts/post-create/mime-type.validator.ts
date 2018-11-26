@@ -1,5 +1,5 @@
 import {AbstractControl} from '@angular/forms';
-import {observable, Observable, Observer} from 'rxjs';
+import {observable, Observable, Observer, of} from 'rxjs';
 
 // Synch - Validators: returns (errorcode, value) or null if valid
 // Asynch - Validators: Promosie or Observable wrapping above
@@ -7,6 +7,10 @@ export const mimeType = (
     control: AbstractControl
     // generic type for (key:value) => [key:string]:any
 ): Promise<{[key: string]: any}> | Observable<{[key: string]: any}> => {
+    if (typeof (control.value) === 'string'){
+        return of(null);
+    }
+
     const file = control.value as File;
 
     const fileReader = new FileReader();

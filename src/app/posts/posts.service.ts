@@ -19,7 +19,7 @@ export class PostsService {
     }
 
     getPost(id: string) {
-        return this.httpClient.get<{_id: string, title: string, content: string}>('http://localhost:3000/api/posts/' + id);
+        return this.httpClient.get<{_id: string, title: string, content: string, imagePath: string}>('http://localhost:3000/api/posts/' + id);
     }
 
     getPosts() {
@@ -89,13 +89,37 @@ export class PostsService {
             });
     }
 
-    updatePost(id: string, title: string, content: string) {
-        const post: Post = {id: id, title: title, content: content, imagePath: null};
+    updatePost(id: string, title: string, content: string, image: File | string) {
+        let postData: Post | FormData;
+        if (typeof(image) === 'object') {
+            // image is a file
+            postData = new FormData();
+            postData.append('id', id);
+            postData.append('title', title);
+            postData.append('content', content);
+            postData.append('image', image);
+        } else {
+            // image is a string
+            postData = {
+                id: id,
+                title: title,
+                content: content,
+                imagePath: image
+            };
+        }
+        
         // second arg is payload
-        this.httpClient.put('http://localhost:3000/api/posts/' + id, post)
-            .subscribe(response => {
+        this.httpClient
+            .put('http://localhost:3000/api/posts/' + id, postData)
+            .subscribe((response) => {
                 const updatedPosts = [...this.posts];
-                const oldPostIndex = updatedPosts.findIndex(p => p.id === post.id);
+                const oldPostIndex = updatedPosts.findIndex(p => p.id === id);
+                const post: Post = {
+                    id: id,
+                    title: title,
+                    content: content,
+                    imagePath: ""
+                };
                 updatedPosts[oldPostIndex] = post;
                 this.posts = updatedPosts;
                 this.postsUpdated.next({...this.posts});

@@ -31,12 +31,12 @@ const storage = multer.diskStorage({
     }
 });
 
+
 router.post("", multer({storage: storage}).single('image'), (req, res, next) => {
-    const url = req.protocol + '://' + req.get('host');
     const post = new Post({
         title: req.body.title,
         content: req.body.content,
-        imagePath: url + "/images/" + req.file.filename
+        imagePath: buildImagePathUrl(req)
     });
     post.save().then(createdPost => {
         res.status(201).json({
@@ -86,16 +86,29 @@ router.delete('/:id', (req, res, next) => {
 });
 
 // put would overwrite
-router.put("/:id", (req, res, next) => {
+router.put("/:id", multer({storage: storage}).single('image'), (req, res, next) => {
+    console.log(req.file);
+    let imagePath = req.body.imagePath;
+    if (req.file){
+        imagePath = buildImagePathUrl(req)
+    }
     const post = new Post({
         _id: req.body.id,
         title: req.body.title,
-        content: req.body.content
+        content: req.body.content,
+        imagePath: imagePath
     });
+
+    console.log(post);
     Post.updateOne({_id: req.params.id}, post).then(result => {
         console.log(result);
         res.status(200).json({message: "Update successful!"})
     })
 });
+
+let buildImagePathUrl = function (req) {
+    const url = req.protocol + '://' + req.get('host');
+    return url + "/images/" + req.file.filename;
+};
 
 module.exports = router;

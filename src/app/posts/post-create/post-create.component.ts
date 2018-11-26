@@ -39,7 +39,7 @@ export class PostCreateComponent implements OnInit {
         });
 
         this.rout.paramMap.subscribe((paramMap: ParamMap) => {
-            // if postId exists, we are actually editing
+            // if postId exists, we are in editing mode
             if (paramMap.has('postId')){
                 this.mode = 'edit';
                 this.postId = paramMap.get('postId');
@@ -53,10 +53,14 @@ export class PostCreateComponent implements OnInit {
                         id: postData._id,
                         title: postData.title,
                         content: postData.content,
-                        imagePath: null
+                        imagePath: postData.imagePath
                     };
                     // init Form
-                    this.form.setValue({'title': this.post.title, 'content': this.post.title});
+                    this.form.setValue({
+                        'title': this.post.title,
+                        'content': this.post.title,
+                        'image': this.post.imagePath
+                    });
                 });
             } else {
                 this.mode = 'create';
@@ -93,7 +97,12 @@ export class PostCreateComponent implements OnInit {
                 this.form.value.content,
                 this.form.value.image);
         } else {
-            this.postsService.updatePost(this.postId, this.form.value.title, this.form.value.content);
+            this.postsService.updatePost(
+                this.postId,
+                this.form.value.title,
+                this.form.value.content,
+                this.form.value.image,
+                );
         }
         this.form.reset();
     }
