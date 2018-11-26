@@ -2,7 +2,14 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {MatButtonModule, MatCardModule, MatInputModule, MatToolbarModule, MatExpansionModule} from '@angular/material';
+import {
+    MatButtonModule,
+    MatCardModule,
+    MatInputModule,
+    MatToolbarModule,
+    MatExpansionModule,
+    MatProgressSpinnerModule
+} from '@angular/material';
 import {HttpClientModule} from '@angular/common/http'
 
 import {AppComponent} from './app.component';
@@ -28,6 +35,7 @@ import {AppRoutingModule} from './app-routing.module';
       MatButtonModule,
       MatToolbarModule,
       MatExpansionModule,
+      MatProgressSpinnerModule,
       HttpClientModule
   ],
   providers: [],
