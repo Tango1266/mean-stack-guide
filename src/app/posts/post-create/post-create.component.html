@@ -4,7 +4,7 @@
     <mat-spinner *ngIf="isLoading"></mat-spinner>
 
     <!--POST FORM-->
-    <form (submit)="onSavePost(postForm)" #postForm="ngForm" *ngIf="!isLoading">
+    <form [formGroup]="form" (submit)="onSavePost()" *ngIf="!isLoading">
 
         <!--POST TITLE-->
         <mat-form-field>
@@ -12,12 +12,10 @@
                     matInput
                     name="title"
                     type="text"
-                    [ngModel]="post?.title"
-                    required
-                    minlength="3"
+                    formControlName="title"
                     placeholder="Post Title"
-            #title="ngModel"/>
-            <mat-error *ngIf="title.invalid">Please enter a post title</mat-error>
+            />
+            <mat-error *ngIf="form.get('title').invalid">Please enter a post title</mat-error>
         </mat-form-field>
 
         <!--IMAGE PICKER-->
@@ -32,14 +30,12 @@
                     matInput
                     name="content"
                     rows="6"
-                    [ngModel]="post?.content"
-                    required
-                    minlength="3"
+                    formControlName="content"
                     placeholder="Post Content"
-            #content="ngModel">
+            >
 
             </textarea>
-            <mat-error *ngIf="content.invalid">Please enter content!</mat-error>
+            <mat-error *ngIf="form.get('content').invalid">Please enter content!</mat-error>
         </mat-form-field>
 
         <!--SUBMIT BUTTON-->

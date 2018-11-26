@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {NgForm} from '@angular/forms';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 import {PostsService} from '../posts.service';
 import {ActivatedRoute, ParamMap} from '@angular/router';
@@ -18,26 +18,35 @@ export class PostCreateComponent implements OnInit {
     private postId: string;
     post: Post;
     isLoading = false;
+    form: FormGroup;
 
     constructor(public postsService: PostsService, public rout: ActivatedRoute) {
     }
 
-    onSavePost(form: NgForm) {
-        if (form.invalid) {
+    onSavePost() {
+        if (this.form.invalid) {
             return;
         }
         // does not need to set to back to false
         // will be redirected where it is handled
         this.isLoading = true;
         if (this.mode === 'create') {
-            this.postsService.addPost(form.value.title, form.value.content);
+            this.postsService.addPost(this.form.value.title, this.form.value.content);
         } else {
-            this.postsService.updatePost(this.postId, form.value.title, form.value.content);
+            this.postsService.updatePost(this.postId, this.form.value.title, this.form.value.content);
         }
-        form.resetForm();
+        this.form.reset();
     }
 
     ngOnInit(): void {
+        this.form = new FormGroup({
+            'title': new FormControl(null, {
+                validators: [Validators.required, Validators.minLength(3)]}),
+            'content': new FormControl(null, {
+                validators: [Validators.required]
+            })
+        });
+
         this.rout.paramMap.subscribe((paramMap: ParamMap) => {
             // if postId exists, we are actually editing
             if (paramMap.has('postId')){
@@ -48,6 +57,8 @@ export class PostCreateComponent implements OnInit {
                 this.postsService.getPost(this.postId).subscribe(postData => {
                     this.isLoading = false;
                     this.post = {id: postData._id, title: postData.title, content: postData.content};
+                    // init Form
+                    this.form.setValue({'title': this.post.title, 'content': this.post.title});
                 });
             } else {
                 this.mode = 'create';
