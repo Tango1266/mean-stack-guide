@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {NgForm} from '@angular/forms';
 
 @Component({
     // no selector because it will be handled through routing
@@ -7,4 +8,8 @@ import {Component} from '@angular/core';
 })
 export class LoginComponent {
     isLoading = false;
+
+    onLogin(form: NgForm) {
+        console.log(form.value);
+    }
 }
