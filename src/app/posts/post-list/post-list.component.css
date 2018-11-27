@@ -20,3 +20,7 @@ map-paginator{
     width: 100%;
     box-shadow: 1px 1px 5px black;
 }
+
+mat-spinner {
+    margin: auto;
+}
