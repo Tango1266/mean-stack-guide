@@ -29,10 +29,11 @@ app.use((req, res, next) =>{
     res.setHeader('Access-Control-Allow-Headers',
         'Origin, X-Requested-With, Content-Type, Accept');
     // CROSS: Only allow certain rest-methods
-    res.setHeader('Access-Control-Allow-Methods',"GET, POST, PUT, PATCH, DELETE, OPTIONS")
+    res.setHeader('Access-Control-Allow-Methods',"GET, POST, PUT, PATCH, DELETE, OPTIONS");
     next();
 });
 
+// default host address: http://localhost:3000
 app.use("/api/posts", postsRoutes);
 app.use("/api/users", usersRoutes);
 
