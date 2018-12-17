@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const postsRoutes = require("./routs/posts");
+const usersRoutes = require('./routs/user');
 
 // create express app
 // (middleware - intersect client server communication)
@@ -33,6 +34,7 @@ app.use((req, res, next) =>{
 });
 
 app.use("/api/posts", postsRoutes);
+app.use("/api/users", usersRoutes);
 
 
 // export the app instance
