@@ -18,13 +18,13 @@ router.post('/signup', (req, res, err) => {
                     res.status(201).json({
                         message: 'User created',
                         result: result
-                    })
-                        .catch(err => {
-                            res.status(500).json({
-                                error: err
-                            });
-                        });
+                    });
                 })
+                .catch(err => {
+                    res.status(500).json({
+                        error: err
+                    });
+                });
         });
 
 });
