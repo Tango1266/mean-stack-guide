@@ -27,7 +27,7 @@ app.use((req, res, next) =>{
     res.setHeader('Access-Control-Allow-Origin', '*');
     // CROSS: Allow only request containing defined attributes
     res.setHeader('Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content-Type, Accept');
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     // CROSS: Only allow certain rest-methods
     res.setHeader('Access-Control-Allow-Methods',"GET, POST, PUT, PATCH, DELETE, OPTIONS");
     next();
