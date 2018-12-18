@@ -4,6 +4,7 @@ import {Subscription} from 'rxjs';
 import {Post} from '../post.model';
 import {PostsService} from '../posts.service';
 import {PageEvent} from '@angular/material';
+import {AuthService} from '../../auth/auth.service';
 
 @Component({
     selector: 'app-post-list',
@@ -16,10 +17,12 @@ export class PostListComponent implements OnInit, OnDestroy {
     totalPosts = 0;
     pageSizeOptions = [1, 2, 5, 10];
     posts: Post[] = [];
+    userIsAuthenticated: boolean;
     private postsSub: Subscription;
     private isLoading = false;
+    private authStatusSub: Subscription;
 
-    constructor(public postsService: PostsService) {
+    constructor(public postsService: PostsService, private  authService: AuthService) {
     }
 
     ngOnInit(): void {
@@ -37,11 +40,22 @@ export class PostListComponent implements OnInit, OnDestroy {
                         this.posts = postData.posts;
                         this.totalPosts = postData.postCount;
                     });
+
+        // post list component will be initialized after login
+        // hence, when subscribing for status listener there will be no status update
+        // hence, we need the current status from the authService
+        this.userIsAuthenticated = this.authService.getIsAuth();
+
+        this.authStatusSub = this.authService.getAuthStatusListener()
+            .subscribe(isAuthenticated => {
+                this.userIsAuthenticated = isAuthenticated;
+            });
     }
 
     ngOnDestroy(): void {
         // prevents memory leaks
         this.postsSub.unsubscribe();
+        this.authStatusSub.unsubscribe();
     }
 
     onDelete(posId: string) {
