@@ -3,8 +3,12 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
+const globalCons = require("../resources/global-cons");
 
 const router = express.Router();
+
+// todo:
+const secretForAuth = globalCons.AUTH_SECRET;
 
 router.post('/signup', (req, res, err) => {
     bcrypt.hash(req.body.password, 10)
@@ -59,7 +63,7 @@ router.post('/login', (req, res, next) => {
 
             // create web token
             const token = jwt.sign({email: fetchedUser.email, userId: fetchedUser._id},
-                'secret_string_this_should_be_longer', //todo:
+                secretForAuth,
                 {expiresIn: '1h'});
 
             res.status(200).json({
