@@ -45,7 +45,7 @@ router.post('/login', (req, res, next) => {
         .then(user => {
             if (!user){
                 return res.status(401).json({
-                    message: 'Auth failed!'
+                    message: 'Auth failed: User not found!'
                 });
             }
             fetchedUser = user;
@@ -57,7 +57,7 @@ router.post('/login', (req, res, next) => {
         .then(result => {
             if (!result){
                 return res.status(401).json({
-                    message: 'Auth failed!'
+                    message: 'Auth failed: Password is incorrect!'
                 });
             }
 
@@ -74,7 +74,7 @@ router.post('/login', (req, res, next) => {
         // respond error if occur
         .catch(err => {
             res.status(401).json({
-                message: 'Auth failed!'
+                message: 'Auth failed: Token could not be signed!'
             });
         })
 });
