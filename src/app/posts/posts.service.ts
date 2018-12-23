@@ -14,13 +14,19 @@ interface RespondObject {
 @Injectable({providedIn: 'root'})
 export class PostsService {
     private posts: Post[] = [];
-    private postsUpdated = new Subject<{posts: Post[], postCount: number}>();
+    private postsUpdated = new Subject<{ posts: Post[], postCount: number }>();
 
     constructor(private httpClient: HttpClient, private router: Router) {
     }
 
     getPost(id: string) {
-        return this.httpClient.get<{_id: string, title: string, content: string, imagePath: string}>('http://localhost:3000/api/posts/' + id);
+        return this.httpClient.get<{
+            _id: string,
+            title: string,
+            content: string,
+            imagePath: string,
+            creator: string
+        }>('http://localhost:3000/api/posts/' + id);
     }
 
     getPosts(postsPerPage: number, currentPage: number) {
@@ -29,7 +35,7 @@ export class PostsService {
             .get<RespondObject>('http://localhost:3000/api/posts' + queryParams)
             // pipe can execute operations on each respondObject
             .pipe(map((postData) => {
-                // transform _id to id
+                    // transform _id to id
                     return {
                         posts: postData.posts.map(post => {
                             const transformedPost = {
@@ -57,7 +63,7 @@ export class PostsService {
                 });
     }
 
-    getPostUpdateListener(){
+    getPostUpdateListener() {
         return this.postsUpdated.asObservable();
     }
 
@@ -71,18 +77,18 @@ export class PostsService {
             .post<{ message: string, post: Post }>(
                 'http://localhost:3000/api/posts',
                 postData)
-            .subscribe( (responseData) => {
+            .subscribe((responseData) => {
                 this.router.navigate(['/']);
             });
     }
 
-    deletePost(postId: string){
-       return this.httpClient.delete('http://localhost:3000/api/posts/' + postId);
+    deletePost(postId: string) {
+        return this.httpClient.delete('http://localhost:3000/api/posts/' + postId);
     }
 
     updatePost(id: string, title: string, content: string, image: File | string) {
         let postData: Post | FormData;
-        if (typeof(image) === 'object') {
+        if (typeof (image) === 'object') {
             // image is a file
             postData = new FormData();
             postData.append('id', id);
@@ -95,10 +101,11 @@ export class PostsService {
                 id: id,
                 title: title,
                 content: content,
-                imagePath: image
+                imagePath: image,
+                creator: null
             };
         }
-        
+
         // second arg is payload
         this.httpClient
             .put('http://localhost:3000/api/posts/' + id, postData)
