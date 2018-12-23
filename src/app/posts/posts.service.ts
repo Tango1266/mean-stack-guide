@@ -1,9 +1,13 @@
 import {Injectable} from '@angular/core';
 import {Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {Post} from './post.model';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
+
+import {environment} from '../../environments/environment';
+import {Post} from './post.model';
+
+const BACKEND_URL = environment.apiUrl + '/posts/';
 
 interface RespondObject {
     message: string;
@@ -26,13 +30,13 @@ export class PostsService {
             content: string,
             imagePath: string,
             creator: string
-        }>('http://localhost:3000/api/posts/' + id);
+        }>( BACKEND_URL + id);
     }
 
     getPosts(postsPerPage: number, currentPage: number) {
         const queryParams = `?page=${currentPage}&pagesize=${postsPerPage}`;
         this.httpClient
-            .get<RespondObject>('http://localhost:3000/api/posts' + queryParams)
+            .get<RespondObject>(BACKEND_URL + queryParams)
             // pipe can execute operations on each respondObject
             .pipe(map((postData) => {
                     // transform _id to id
@@ -75,7 +79,7 @@ export class PostsService {
 
         this.httpClient
             .post<{ message: string, post: Post }>(
-                'http://localhost:3000/api/posts',
+                BACKEND_URL,
                 postData)
             .subscribe((responseData) => {
                 this.router.navigate(['/']);
@@ -83,7 +87,7 @@ export class PostsService {
     }
 
     deletePost(postId: string) {
-        return this.httpClient.delete('http://localhost:3000/api/posts/' + postId);
+        return this.httpClient.delete(BACKEND_URL + postId);
     }
 
     updatePost(id: string, title: string, content: string, image: File | string) {
@@ -108,7 +112,7 @@ export class PostsService {
 
         // second arg is payload
         this.httpClient
-            .put('http://localhost:3000/api/posts/' + id, postData)
+            .put(BACKEND_URL + id, postData)
             .subscribe((response) => {
                 this.router.navigate(['/']);
             });
