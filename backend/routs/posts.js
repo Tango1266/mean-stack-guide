@@ -1,9 +1,8 @@
 const express = require('express');
 const multer = require('multer');
 
-
-const Post = require('../models/post');
 const checkAuth = require('../middleware/check-auth');
+const PostsController = require('../controllers/posts');
 
 const router = express.Router();
 
@@ -28,149 +27,34 @@ const storage = multer.diskStorage({
         const name = file.originalname.toLowerCase().split(' ').join('-');
         const extension = MIME_TYPE_MAP[file.mimetype];
         callback(null, name + '-' + Date.now() + '.' + extension)
-
     }
 });
 
 
-router.post("",
+// get all posts
+router.get('', PostsController.getPosts);
+
+// get one post
+router.get('/:id', PostsController.getPost);
+
+// update post - put will overwrite
+router.put(
+    "/:id",
     checkAuth,
     multer({storage: storage}).single('image'),
-    (req, res, next) => {
-        const post = new Post({
-            title: req.body.title,
-            content: req.body.content,
-            imagePath: buildImagePathUrl(req),
-            creator: req.userData.userId
-        });
+    PostsController.updatePost);
 
-        post.save()
-            .then(createdPost => {
-                res.status(201).json({
-                    message: 'Post successfully added!',
-                    // id is stored in DB as _id
-                    post: {
-                        ...createdPost,
-                        id: createdPost._id,
-                    }
-                })
-            })
-            .catch(err => {
-                res.status(500).json({
-                    message: "Post could not be created."
-                });
-            });
-        // don't use next here, because responde is already out
-    });
-
-router.get('', (req, res, next) => {
-    console.log(req.query)
-    const pageSize = +req.query.pagesize;
-    const currentPage = +req.query.page;
-    const postQuery = Post.find();
-    let fetchedPosts;
-
-    if(pageSize && currentPage){
-        // constraint on query
-        postQuery
-            .skip(pageSize * (currentPage - 1))
-            .limit(pageSize);
-    }
-    // find returns error and results when finished
-    postQuery.then(documents => {
-        fetchedPosts = documents;
-        return Post.count();
-    }).then(count => {
-       res.status(200).json({
-           message: "Posts fetched successfully!",
-           posts: fetchedPosts,
-           maxPosts: count
-       })
-
-    })
-        .catch(error => {
-            res.status(500).json({
-                message: "Posts could not be fetched."
-            })
-        })
-});
-
-router.get('/:id', (req, res, next) => {
-    Post.findById(req.params.id).then(post => {
-        if (post) {
-            res.status(200).json(post)
-        } else {
-            res.status(404).json({message: 'Post not found!'})
-        }
-    })
-        .catch(error => {
-        res.status(500).json({
-            message: "Post could not be fetched."
-        })
-    });
-});
-
-router.delete('/:id',
-    checkAuth,
-    (req, res, next) => {
-        // in DB id is underscored
-        Post.deleteOne(
-            {_id: req.params.id, creator: req.userData.userId}
-        )
-            .then(result => {
-                console.log(result);
-                if (result.n > 0) {
-                    res.status(200).json({message: ' Post deleted!'})
-                } else {
-                    res.status(401).json({message: "Not authorized!"})
-                }
-            })
-            .catch(error => {
-                res.status(500).json({
-                    message: "Post could not be deleted."
-                })
-            });
-    });
-
-// put would overwrite
-router.put("/:id",
+// create post
+router.post(
+    "",
     checkAuth,
     multer({storage: storage}).single('image'),
-    (req, res, next) => {
-        console.log(req.file);
-        let imagePath = req.body.imagePath;
-        if (req.file) {
-            imagePath = buildImagePathUrl(req)
-        }
-        const post = new Post({
-            _id: req.body.id,
-            title: req.body.title,
-            content: req.body.content,
-            imagePath: imagePath,
-            creator: req.userData.userId
-        });
+    PostsController.createPost);
 
-        Post.updateOne(
-                // updates only records where all json attributes are matching record attributes
-                {_id: req.params.id, creator: req.userData.userId},
-                // update data
-                post
-            )
-            .then(result => {
-                    if (result.nModified > 0) {
-                        res.status(200).json({message: "Update successful!"})
-                    } else {
-                        res.status(401).json({message: "Not authorized!"})
-                    }
-                }
-            ).catch(error => {
-               res.status(500).json({message: "Post could not be updated."})
-        })
-    });
-
-let buildImagePathUrl = function (req) {
-    const url = req.protocol + '://' + req.get('host');
-    return url + "/images/" + req.file.filename;
-};
+// delete one post
+router.delete(
+    '/:id',
+    checkAuth,
+    PostsController.deletePost);
 
 module.exports = router;
