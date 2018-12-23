@@ -106,7 +106,6 @@ exports.updatePost = (req, res, next) => {
         imagePath: imagePath,
         creator: req.userData.userId
     });
-
     Post.updateOne(
         // updates only records where all json attributes are matching record attributes
         {_id: req.params.id, creator: req.userData.userId},
@@ -114,7 +113,7 @@ exports.updatePost = (req, res, next) => {
         post
     )
         .then(result => {
-                if (result.nModified > 0) {
+            if (result.n > 0) {
                     res.status(200).json({message: "Update successful!"})
                 } else {
                     res.status(401).json({message: "Not authorized!"})
