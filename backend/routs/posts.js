@@ -37,27 +37,29 @@ router.post("",
     checkAuth,
     multer({storage: storage}).single('image'),
     (req, res, next) => {
-    const post = new Post({
-        title: req.body.title,
-        content: req.body.content,
-        imagePath: buildImagePathUrl(req),
-        creator: req.userData.userId
-    });
-
-    post.save().then(createdPost => {
-        res.status(201).json({
-            message: 'Post successfully added!',
-            // id is stored in DB as _id
-            post: {
-                ...createdPost,
-                id: createdPost._id,
-            }
-        }).catch(err => {
-            console.log(err)
+        const post = new Post({
+            title: req.body.title,
+            content: req.body.content,
+            imagePath: buildImagePathUrl(req),
+            creator: req.userData.userId
         });
+
+        post.save()
+            .then(createdPost => {
+                res.status(201).json({
+                    message: 'Post successfully added!',
+                    // id is stored in DB as _id
+                    post: {
+                        ...createdPost,
+                        id: createdPost._id,
+                    }
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            });
+        // don't use next here, because responde is already out
     });
-    // don't use next here, because responde is already out
-});
 
 router.get('', (req, res, next) => {
     console.log(req.query)
@@ -99,36 +101,52 @@ router.get('/:id', (req, res, next) => {
 router.delete('/:id',
     checkAuth,
     (req, res, next) => {
-    // in DB id is underscored
-    Post.deleteOne({_id: req.params.id}).then(result => {
-        console.log(result);
-        res.status(200).json({message:' Post deleted!'})
+        // in DB id is underscored
+        Post.deleteOne(
+            {_id: req.params.id, creator: req.userData.userId}
+        )
+            .then(result => {
+                console.log(result);
+                if (result.n > 0) {
+                    res.status(200).json({message: ' Post deleted!'})
+                } else {
+                    res.status(401).json({message: "Not authorized!"})
+                }
+            });
     });
-});
 
 // put would overwrite
 router.put("/:id",
     checkAuth,
     multer({storage: storage}).single('image'),
     (req, res, next) => {
-    console.log(req.file);
-    let imagePath = req.body.imagePath;
-    if (req.file){
-        imagePath = buildImagePathUrl(req)
-    }
-    const post = new Post({
-        _id: req.body.id,
-        title: req.body.title,
-        content: req.body.content,
-        imagePath: imagePath
-    });
+        console.log(req.file);
+        let imagePath = req.body.imagePath;
+        if (req.file) {
+            imagePath = buildImagePathUrl(req)
+        }
+        const post = new Post({
+            _id: req.body.id,
+            title: req.body.title,
+            content: req.body.content,
+            imagePath: imagePath
+        });
 
-    console.log(post);
-    Post.updateOne({_id: req.params.id}, post).then(result => {
-        console.log(result);
-        res.status(200).json({message: "Update successful!"})
-    })
-});
+        Post.updateOne(
+                // updates only records where all json attributes are matching record attributes
+                {_id: req.params.id, creator: req.userData.userId},
+                // update data
+                post
+            )
+            .then(result => {
+                    if (result.nModified > 0) {
+                        res.status(200).json({message: "Update successful!"})
+                    } else {
+                        res.status(401).json({message: "Not authorized!"})
+                    }
+                }
+            )
+    });
 
 let buildImagePathUrl = function (req) {
     const url = req.protocol + '://' + req.get('host');
