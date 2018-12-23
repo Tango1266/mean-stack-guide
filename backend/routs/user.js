@@ -27,7 +27,7 @@ router.post('/signup', (req, res, err) => {
                 })
                 .catch(err => {
                     res.status(500).json({
-                        error: err
+                        message: 'Invalid authentication credentials'
                     });
                 });
         });
@@ -45,7 +45,7 @@ router.post('/login', (req, res, next) => {
         .then(user => {
             if (!user){
                 return res.status(401).json({
-                    message: 'Auth failed: User not found!'
+                    message: 'Unknown email address!'
                 });
             }
             fetchedUser = user;
@@ -57,7 +57,7 @@ router.post('/login', (req, res, next) => {
         .then(result => {
             if (!result){
                 return res.status(401).json({
-                    message: 'Auth failed: Password is incorrect!'
+                    message: 'Incorrect password!'
                 });
             }
 
@@ -74,9 +74,9 @@ router.post('/login', (req, res, next) => {
         })
 
         // respond error if occur
-        .catch(err => {
+        .catch(error => {
             res.status(401).json({
-                message: 'Auth failed: Token could not be signed!'
+                message: 'Authentication failed!'
             });
         })
 });

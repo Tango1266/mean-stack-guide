@@ -56,7 +56,9 @@ router.post("",
                 })
             })
             .catch(err => {
-                console.log(err)
+                res.status(500).json({
+                    message: "Post could not be created."
+                });
             });
         // don't use next here, because responde is already out
     });
@@ -86,6 +88,11 @@ router.get('', (req, res, next) => {
        })
 
     })
+        .catch(error => {
+            res.status(500).json({
+                message: "Posts could not be fetched."
+            })
+        })
 });
 
 router.get('/:id', (req, res, next) => {
@@ -95,6 +102,11 @@ router.get('/:id', (req, res, next) => {
         } else {
             res.status(404).json({message: 'Post not found!'})
         }
+    })
+        .catch(error => {
+        res.status(500).json({
+            message: "Post could not be fetched."
+        })
     });
 });
 
@@ -112,6 +124,11 @@ router.delete('/:id',
                 } else {
                     res.status(401).json({message: "Not authorized!"})
                 }
+            })
+            .catch(error => {
+                res.status(500).json({
+                    message: "Post could not be deleted."
+                })
             });
     });
 
@@ -146,7 +163,9 @@ router.put("/:id",
                         res.status(401).json({message: "Not authorized!"})
                     }
                 }
-            )
+            ).catch(error => {
+               res.status(500).json({message: "Post could not be updated."})
+        })
     });
 
 let buildImagePathUrl = function (req) {
