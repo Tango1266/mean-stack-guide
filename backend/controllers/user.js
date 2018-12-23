@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const globalCons = require("../resources/global-cons");
 const User = require('../models/user');
 
 exports.createUser = (req, res, err) => {
@@ -56,7 +55,7 @@ exports.loginUser = (req, res, next) => {
 
             // create web token
             const token = jwt.sign({email: fetchedUser.email, userId: fetchedUser._id},
-                globalCons.AUTH_SECRET,
+                process.env.JWT_KEY,
                 {expiresIn: '1h'});
 
             res.status(200).json({

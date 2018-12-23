@@ -10,7 +10,7 @@ const usersRoutes = require('./routs/user');
 // (middleware - intersect client server communication)
 const app = express();
 
-mongoose.connect("mongodb://localhost:27017/mean-stack").then(() => {
+mongoose.connect(process.env.MONGO_DB_ADDRESS).then(() => {
     console.log('Connected to database!');
 }).catch(() => {
     console.log('Connection failed!');

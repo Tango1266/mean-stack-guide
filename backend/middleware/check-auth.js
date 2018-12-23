@@ -9,7 +9,7 @@ module.exports = (req,  res, next) => {
         const token = req.headers.authorization.split(" ")[1];
 
         // verify decodes the token
-        const decodedToken = jwt.verify(token, globalCons.AUTH_SECRET);
+        const decodedToken = jwt.verify(token, process.env.JWT_KEY);
 
         // create and add userInformation to request from token
         req.userData = {email: decodedToken.email, userId: decodedToken.userId};
