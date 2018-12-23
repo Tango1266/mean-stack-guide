@@ -7,7 +7,13 @@ module.exports = (req,  res, next) => {
     // 'Baerer' + " " + token
     try {
         const token = req.headers.authorization.split(" ")[1];
-        jwt.verify(token, globalCons.AUTH_SECRET);
+
+        // verify decodes the token
+        const decodedToken = jwt.verify(token, globalCons.AUTH_SECRET);
+
+        // create and add userInformation to request from token
+        req.userData = {email: decodedToken.email, userId: decodedToken.userId};
+
         next();
     } catch (error) {
         res.status(401).json({message: 'Auth failed!'});

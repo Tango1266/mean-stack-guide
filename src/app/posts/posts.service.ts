@@ -36,7 +36,8 @@ export class PostsService {
                                 id: post._id,
                                 title: post.title,
                                 content: post.content,
-                                imagePath: post.imagePath
+                                imagePath: post.imagePath,
+                                creator: post.creator
                             };
                             return transformedPost;
                         }),
@@ -49,7 +50,10 @@ export class PostsService {
                 // httpClient will return body of the respond
                 (transformedPostData) => {
                     this.posts = transformedPostData.posts;
-                    this.postsUpdated.next({posts: [...this.posts], postCount: transformedPostData.maxPosts});
+                    this.postsUpdated.next({
+                        posts: [...this.posts],
+                        postCount: transformedPostData.maxPosts
+                    });
                 });
     }
 
