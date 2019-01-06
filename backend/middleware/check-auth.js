@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const globalCons = require('../resources/global-cons');
 
 // middleware function
 module.exports = (req,  res, next) => {

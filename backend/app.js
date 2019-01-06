@@ -10,10 +10,12 @@ const usersRoutes = require('./routs/user');
 // (middleware - intersect client server communication)
 const app = express();
 
-mongoose.connect(process.env.MONGO_DB_ADDRESS).then(() => {
-    console.log('Connected to database!');
-}).catch(() => {
-    console.log('Connection failed!');
+mongoose.connect(getDbConnection())
+    .then(() => {
+        console.log('Connected to database!');
+    })
+    .catch(() => {
+        console.log('Connection failed!');
 });
 
 app.use(bodyParser.json());
@@ -40,3 +42,14 @@ app.use("/api/users", usersRoutes);
 
 // export the app instance
 module.exports = app;
+
+// helper
+function getDbConnection() {
+    if (process.env.DEV === true || process.argv.includes('dev')) {
+        console.log("connect to local db: "
+            + (process.env.DEV === true ? "env found!" : "run parameter found!")
+        );
+        return process.env.MONGO_DB_ADDRESS_DEV;
+    }
+    return process.env.MONGO_DB_ADDRESS_PROD;
+}

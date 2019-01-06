@@ -48,7 +48,7 @@ const onListening = () => {
 
 // process.env.PORT will be set from a web hosting provider
 // default host address: http://localhost:3000
-const port = normalizePort(process.env.PORT || 3000);
+const port = normalizePort(process.env.PORT || process.env.DEFAULT_PORT || 3000);
 app.set('port',port);
 
 const server = http.createServer(app);

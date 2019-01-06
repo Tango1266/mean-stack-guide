@@ -10,6 +10,7 @@
     "e2e": "ng e2e",
     "start:db": "docker-compose -f ./backend/persistence/docker-compose.yml up",
     "start:server": "nodemon backend/server.js",
+    "start:devserver": "nodemon backend/server.js -- dev",
     "stop:db": "docker-compose -f ./backend/persistence/docker-compose.yml down"
   },
   "private": true,
