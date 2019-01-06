@@ -1,7 +1,10 @@
 {
   "env": {
     "MONGO_ATLAS_PASSWORD_PW":"",
-    "MONGO_DB_ADDRESS": "mongodb://localhost:27017/mean-stack",
-    "JWT_KEY": "secret_string_this_should_be_longer"
+    "MONGO_DB_ADDRESS_DEV": "mongodb://localhost:27017/mean-stack",
+    "MONGO_DB_ADDRESS_PROD":"this need to be set",
+    "JWT_KEY": "secret_string_this_should_be_longer",
+    "DEFAULT_PORT": 3000,
+    "DEV": false
   }
 }
